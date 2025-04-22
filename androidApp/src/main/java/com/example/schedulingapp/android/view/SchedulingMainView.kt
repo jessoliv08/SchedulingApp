@@ -8,10 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.schedulingapp.ScheduleMeetingViewModel
 import com.example.schedulingapp.android.MyApplicationTheme
 import com.example.schedulingapp.android.view.selectdate.SelectDateView
 import com.example.schedulingapp.android.view.selecthour.SelectHourView
-import com.example.schedulingapp.viewmodel.ScheduleMeetingViewModel
 
 
 @Composable

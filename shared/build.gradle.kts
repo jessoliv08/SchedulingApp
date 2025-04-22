@@ -3,12 +3,15 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
 }
+group = "com.example.schedulingapp"
 
 kotlin {
     android()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+
+    val frameworkName = "shared"
 
     cocoapods {
         summary = "Some description for the Shared Module"
@@ -17,9 +20,9 @@ kotlin {
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
         framework {
-            baseName = "shared"
+            baseName = frameworkName
             isStatic = false
-            freeCompilerArgs = listOf("-Xobjc-generics") // Pode ser necessário
+            freeCompilerArgs = listOf("-Xobjc-generics")
         }
     }
 
@@ -36,31 +39,33 @@ kotlin {
             }
         }
 
-        val androidMain by getting
-        val androidUnitTest by getting
-
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
-
         val iosMain by creating {
             dependsOn(commonMain)
-            iosX64Main.dependsOn(this)
-            iosArm64Main.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
         }
 
-        val iosX64Test by getting
-        val iosArm64Test by getting
-        val iosSimulatorArm64Test by getting
+        val iosX64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosArm64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
+        }
 
         val iosTest by creating {
             dependsOn(commonTest)
-            iosX64Test.dependsOn(this)
-            iosArm64Test.dependsOn(this)
-            iosSimulatorArm64Test.dependsOn(this)
         }
     }
+
+    listOf(iosArm64(), iosSimulatorArm64()).forEach {
+        it.binaries.framework {
+            baseName = frameworkName
+            isStatic = false
+            freeCompilerArgs += listOf("-Xobjc-generics")
+        }
+    }
+
     jvmToolchain(11)
 }
 
@@ -80,4 +85,30 @@ android {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = "11"
+}
+
+tasks.register("assembleXCFramework") {
+    dependsOn(
+        tasks.named("linkReleaseFrameworkIosArm64"),
+        tasks.named("linkReleaseFrameworkIosSimulatorArm64")
+    )
+
+    doLast {
+        val outputDir = buildDir.resolve("XCFrameworks/Release")
+        outputDir.mkdirs()
+
+        val frameworkArm64 = buildDir.resolve("bin/iosArm64/ReleaseFramework/shared.framework")
+        val frameworkSim = buildDir.resolve("bin/iosSimulatorArm64/ReleaseFramework/shared.framework")
+
+        val xcframeworkOutput = outputDir.resolve("shared.xcframework")
+
+        exec {
+            commandLine(
+                "xcodebuild", "-create-xcframework",
+                "-framework", frameworkArm64.absolutePath,
+                "-framework", frameworkSim.absolutePath,
+                "-output", xcframeworkOutput.absolutePath
+            )
+        }
+    }
 }

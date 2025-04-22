@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import com.example.schedulingapp.android.R
-import com.example.schedulingapp.viewmodel.ScheduleMeetingViewModel
 import androidx.compose.runtime.*
+import com.example.schedulingapp.ScheduleMeetingViewModel
 
 @Composable
 fun SelectHourView(navController: NavHostController, viewModel: ScheduleMeetingViewModel) {

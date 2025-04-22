@@ -12,6 +12,9 @@
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		9E8777E5E5B92959B897F9A6 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B355D885894394B4D1C95E9 /* Pods_iosApp.framework */; };
+		C209E14B2DB7C2E300FC0CF1 /* SharedViewModelWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C209E14A2DB7C2E300FC0CF1 /* SharedViewModelWrapper.swift */; };
+		C209E14F2DB7C36200FC0CF1 /* SelectDateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C209E14E2DB7C36200FC0CF1 /* SelectDateView.swift */; };
+		C209E1512DB7C38B00FC0CF1 /* SelectHourView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C209E1502DB7C38B00FC0CF1 /* SelectHourView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +27,9 @@
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		763F0E662BDAD406D9AB4778 /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
+		C209E14A2DB7C2E300FC0CF1 /* SharedViewModelWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedViewModelWrapper.swift; sourceTree = "<group>"; };
+		C209E14E2DB7C36200FC0CF1 /* SelectDateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectDateView.swift; sourceTree = "<group>"; };
+		C209E1502DB7C38B00FC0CF1 /* SelectHourView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectHourView.swift; sourceTree = "<group>"; };
 		C21B803D2DB16B1C008A4529 /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../shared/build/XCFrameworks/Release/shared.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -77,6 +83,8 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				C209E14D2DB7C34300FC0CF1 /* view */,
+				C209E1492DB7C2C900FC0CF1 /* observable */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
@@ -93,6 +101,23 @@
 				6B355D885894394B4D1C95E9 /* Pods_iosApp.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C209E1492DB7C2C900FC0CF1 /* observable */ = {
+			isa = PBXGroup;
+			children = (
+				C209E14A2DB7C2E300FC0CF1 /* SharedViewModelWrapper.swift */,
+			);
+			path = observable;
+			sourceTree = "<group>";
+		};
+		C209E14D2DB7C34300FC0CF1 /* view */ = {
+			isa = PBXGroup;
+			children = (
+				C209E14E2DB7C36200FC0CF1 /* SelectDateView.swift */,
+				C209E1502DB7C38B00FC0CF1 /* SelectHourView.swift */,
+			);
+			path = view;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -227,6 +252,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C209E1512DB7C38B00FC0CF1 /* SelectHourView.swift in Sources */,
+				C209E14F2DB7C36200FC0CF1 /* SelectDateView.swift in Sources */,
+				C209E14B2DB7C2E300FC0CF1 /* SharedViewModelWrapper.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 			);
