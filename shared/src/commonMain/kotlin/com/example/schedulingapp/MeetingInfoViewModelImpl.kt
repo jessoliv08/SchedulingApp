@@ -4,7 +4,7 @@ import com.example.schedulingapp.usecase.MeetingUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class MeetingInfoViewModelImpl(
@@ -39,24 +39,24 @@ class MeetingInfoViewModelImpl(
 
     private val meetingInfo = meetingUseCase.getMeetingDate()
 
-    override val calendarInfo = meetingInfo.mapNotNull {
+    override val calendarInfo = meetingInfo.map {
         IconText(
             ImageResource.CALENDAR_ICON,
             it?.dateTime ?: ""
         )
-    }.stateIn(scope, SharingStarted.Lazily, null)
+    }.stateIn(scope, SharingStarted.WhileSubscribed(), null)
 
-    override val name = meetingInfo.mapNotNull {
+    override val name = meetingInfo.map {
         IconText(
             ImageResource.PROFILE_IMAGE,
             it?.name ?: ""
         )
-    }.stateIn(scope, SharingStarted.Lazily, null)
+    }.stateIn(scope, SharingStarted.WhileSubscribed(), null)
 
-    override val email = meetingInfo.mapNotNull {
+    override val email = meetingInfo.map {
         IconText(
             ImageResource.EMAIL_ICON,
             it?.email ?: ""
         )
-    }.stateIn(scope, SharingStarted.Lazily, null)
+    }.stateIn(scope, SharingStarted.WhileSubscribed(), null)
 }

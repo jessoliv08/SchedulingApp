@@ -1,7 +1,6 @@
 package com.example.schedulingapp.android.view.selecthour
 
 import android.content.res.Configuration
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,9 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,16 +28,17 @@ import com.example.schedulingapp.SetupInterviewedViewModel
 import com.example.schedulingapp.SetupInterviewedViewModelImpl
 import com.example.schedulingapp.android.MyApplicationTheme
 import com.example.schedulingapp.android.view.components.IconTextView
+import com.example.schedulingapp.android.view.components.ListButtonSelectionView
 import kotlinx.datetime.LocalDate
 
 @Composable
 fun SelectHourView(
     navController: NavHostController,
-    viewModel : SelectHourViewModel,
+    selectHourViewModel : SelectHourViewModel,
     setupInterviewedViewModel: SetupInterviewedViewModel
 ) {
-    val selectedDate by viewModel.dateSelected.collectAsState()
-    val availableTimes by viewModel.availableTime.collectAsState()
+    val selectedDate by selectHourViewModel.dateSelected.collectAsState()
+    val availableTimes by selectHourViewModel.availableTime.collectAsState()
 
     MyApplicationTheme {
         Scaffold(
@@ -82,8 +79,11 @@ fun SelectHourView(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
                     ) {
-                        Text(text = viewModel.timeZoneTitle, style = MaterialTheme.typography.subtitle2)
-                        IconTextView(viewModel.timeZone)
+                        Text(
+                            text = selectHourViewModel.timeZoneTitle,
+                            style = MaterialTheme.typography.subtitle2
+                        )
+                        IconTextView(selectHourViewModel.timeZone)
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Divider(
@@ -92,48 +92,24 @@ fun SelectHourView(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Text(
-                        text = viewModel.selectHourTitle,
+                        text = selectHourViewModel.selectHourTitle,
                         style = MaterialTheme.typography.subtitle1
                     )
                     Text(
-                        text = viewModel.selectHourDescription,
+                        text = selectHourViewModel.selectHourDescription,
                         style = MaterialTheme.typography.body2
                     )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(padding)
-                            .verticalScroll(rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        for (availableDate in availableTimes) {
-                            Button(
-                                onClick = {
-                                    selectedDate?.let {
-                                        setupInterviewedViewModel.setDateAndTime(
-                                            it,
-                                            availableDate
-                                        )
-                                    }
-                                    navController.navigate("third")
-                                },
-                                shape = RoundedCornerShape(8.dp),
-                                elevation = null,
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = Color.Transparent,
-                                    contentColor = MaterialTheme.colors.primary
-                                ),
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp)
-                                    .border(
-                                        1.dp,
-                                        MaterialTheme.colors.primary.copy(alpha = 0.7f),
-                                        RoundedCornerShape(8.dp)
-                                    )
-                            ) {
-                                Text(availableDate.toString())
-                            }
+                    ListButtonSelectionView(
+                        padding,
+                        availableTimes
+                    ) { availableDate ->
+                        selectedDate?.let {
+                            setupInterviewedViewModel.setDateAndTime(
+                                it,
+                                availableDate
+                            )
                         }
+                        navController.navigate("third")
                     }
                 }
             }
@@ -141,7 +117,7 @@ fun SelectHourView(
     }
 }
 
-fun formatLocalDate(date: LocalDate): String {
+private fun formatLocalDate(date: LocalDate): String {
     val dayOfWeek = date.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() } // Thursday
     val month = date.month.name.lowercase().replaceFirstChar { it.uppercase() }          // April
     val day = date.dayOfMonth                                                              // 23
@@ -156,7 +132,7 @@ fun formatLocalDate(date: LocalDate): String {
 fun LightModePreview() {
     SelectHourView(
         navController = rememberNavController(),
-        viewModel = SelectHourViewModelImpl(rememberCoroutineScope()
+        selectHourViewModel = SelectHourViewModelImpl(rememberCoroutineScope()
         ).apply {
             setSelectedDate(LocalDate.parse("2025-04-21"))
     },
@@ -168,7 +144,7 @@ fun LightModePreview() {
 fun DarkModePreview() {
     SelectHourView(
         navController = rememberNavController(),
-        viewModel = SelectHourViewModelImpl(rememberCoroutineScope()
+        selectHourViewModel = SelectHourViewModelImpl(rememberCoroutineScope()
         ).apply {
             setSelectedDate(LocalDate.parse("2025-04-21"))
         },

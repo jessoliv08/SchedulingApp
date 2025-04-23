@@ -1,5 +1,8 @@
 package com.example.schedulingapp.android.view.meeting
 
+import android.app.Activity
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.BackHandler
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -44,12 +47,12 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 fun MeetingInfoView(
     navController: NavHostController,
-    viewModel: MeetingInfoViewModel
+    meetingInfoViewModel: MeetingInfoViewModel
 ) {
-    val button by viewModel.cancelButton.state.collectAsState()
-    val name by viewModel.name.collectAsState()
-    val email by viewModel.email.collectAsState()
-    val calendarInfo by viewModel.calendarInfo.collectAsState()
+    val cancelButton by meetingInfoViewModel.cancelButton.state.collectAsState()
+    val name by meetingInfoViewModel.name.collectAsState()
+    val email by meetingInfoViewModel.email.collectAsState()
+    val calendarInfo by meetingInfoViewModel.calendarInfo.collectAsState()
 
     MyApplicationTheme {
         Scaffold(
@@ -62,7 +65,7 @@ fun MeetingInfoView(
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
-                                painter = painterResource(id = getImageAssetName(viewModel.logo)),
+                                painter = painterResource(id = getImageAssetName(meetingInfoViewModel.logo)),
                                 contentDescription = "App Title",
                                 modifier = Modifier.size(32.dp)
                             )
@@ -71,48 +74,62 @@ fun MeetingInfoView(
                 )
             },
             content = { padding ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(5.dp)
-                ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text(text = viewModel.interviewInfo, style = MaterialTheme.typography.h1)
+                calendarInfo?.let { calendarInfo ->
                     Column(
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
-                        IconTextView(viewModel.timeInfo)
-                        IconTextView(viewModel.callInfo)
-                        calendarInfo?.let { IconTextView(it) }
-                        IconTextView(viewModel.timeZone)
-                        name?.let { IconTextView(it) }
-                        email?.let { IconTextView(it) }
-                    }
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Button(onClick = {
-                        viewModel.cancelButton.action()
-                        navController.navigate("first")
-                    },
-                        shape = RoundedCornerShape(8.dp),
-                        elevation = null,
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Transparent,
-                            contentColor = MaterialTheme.colors.primary
-                        ),
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp)
-                            .border(1.dp, MaterialTheme.colors.primary.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
-                    ) {
-                        button?.title?.let {
-                            Text(it)
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(text = meetingInfoViewModel.interviewInfo, style = MaterialTheme.typography.h1)
+                        Column(
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
+                        ) {
+                            IconTextView(meetingInfoViewModel.timeInfo)
+                            IconTextView(meetingInfoViewModel.callInfo)
+                            calendarInfo?.let { IconTextView(it) }
+                            IconTextView(meetingInfoViewModel.timeZone)
+                            name?.let { IconTextView(it) }
+                            email?.let { IconTextView(it) }
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Button(onClick = {
+                            meetingInfoViewModel.cancelButton.action()
+                            navController.navigate("first")
+                        },
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = null,
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.Transparent,
+                                contentColor = MaterialTheme.colors.primary
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 30.dp)
+                                .border(
+                                    1.dp,
+                                    MaterialTheme.colors.primary.copy(alpha = 0.7f),
+                                    RoundedCornerShape(8.dp)
+                                )
+                        ) {
+                            cancelButton?.title?.let {
+                                Text(it)
+                            }
                         }
                     }
                 }
             }
         )
+    }
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    BackHandler {
+        activity?.finish()
     }
 }
 
@@ -123,7 +140,7 @@ fun MeetingInfoView(
 fun LightModePreview() {
     MeetingInfoView(
         navController = rememberNavController(),
-        viewModel = MeetingInfoViewModelImpl(
+        meetingInfoViewModel = MeetingInfoViewModelImpl(
             rememberCoroutineScope(),
             object : MeetingUseCase {
                 override fun saveMeetingDate(name: String, email: String, dateAndTime: String) {
@@ -151,7 +168,7 @@ fun LightModePreview() {
 fun DarkModePreview() {
     MeetingInfoView(
         navController = rememberNavController(),
-        viewModel = MeetingInfoViewModelImpl(rememberCoroutineScope(),
+        meetingInfoViewModel = MeetingInfoViewModelImpl(rememberCoroutineScope(),
             object : MeetingUseCase {
                 override fun saveMeetingDate(name: String, email: String, dateAndTime: String) {
                     TODO("Not yet implemented")
@@ -168,7 +185,6 @@ fun DarkModePreview() {
                 override fun clearMeetingDate() {
                     TODO("Not yet implemented")
                 }
-
             }),
     )
 }

@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 
-class SelectHourViewModelImpl(scope: CoroutineScope, useCase: AppointmentUseCase? = null): SelectHourViewModel {
+class SelectHourViewModelImpl(
+    scope: CoroutineScope,
+    appointmentUseCase: AppointmentUseCase? = null
+) : SelectHourViewModel {
     private val _dateSelected = MutableStateFlow<LocalDate?>(null)
     override val dateSelected: StateFlow<LocalDate?> = _dateSelected.asStateFlow()
 
@@ -29,7 +32,7 @@ class SelectHourViewModelImpl(scope: CoroutineScope, useCase: AppointmentUseCase
     override val selectHourDescription = "Duration: 30 min"
     private val _availableDate = dateSelected.flatMapLatest { date ->
         date?.let {
-            useCase?.getAvailableLocalTimes(it)
+            appointmentUseCase?.getAvailableLocalTimes(it)
         } ?: flowOf(emptyList())
     }.stateIn(scope, SharingStarted.Lazily, emptyList())
     override val availableTime: StateFlow<List<LocalTime>> = _availableDate

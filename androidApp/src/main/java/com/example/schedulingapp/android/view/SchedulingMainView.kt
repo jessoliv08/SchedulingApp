@@ -22,7 +22,7 @@ import androidx.compose.runtime.getValue
 
 @Composable
 fun SchedulingMainView(
-    viewModel : SelectDateViewModel,
+    selectDateViewModel : SelectDateViewModel,
     selectHourViewModel : SelectHourViewModel,
     setupInterviewedViewModel: SetupInterviewedViewModel,
     meetingInfoViewModel: MeetingInfoViewModel
@@ -41,7 +41,7 @@ fun SchedulingMainView(
                 "first"
             }
             NavHost(navController = navController, startDestination = startScreen) {
-                composable("first") { SelectDateView(navController, viewModel, selectHourViewModel) }
+                composable("first") { SelectDateView(navController, selectDateViewModel, selectHourViewModel) }
                 composable("second") { SelectHourView(navController, selectHourViewModel, setupInterviewedViewModel) }
                 composable("third") { SetupInterviewedView(navController, setupInterviewedViewModel) }
                 composable("fourth") { MeetingInfoView(navController, meetingInfoViewModel) }

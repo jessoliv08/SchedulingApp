@@ -15,7 +15,7 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
 class AppointmentUseCaseImpl(
-    private val repository: AppointmentRepository
+    private val appointmentRepository: AppointmentRepository
 ): AppointmentUseCase {
     override fun getAvailableLocalDates(
         startDateTime: String,
@@ -26,7 +26,7 @@ class AppointmentUseCaseImpl(
             val today = Clock.System.now()
                 .toLocalDateTime(TimeZone.currentSystemDefault())
                 .date
-            val result = repository.getAvailableTimes(startDateTime, endDateTime, mockResponseName)
+            val result = appointmentRepository.getAvailableTimes(startDateTime, endDateTime, mockResponseName)
                 .map { convertToLocalDate(it) }.filter { it >= today }.distinct()
             emit(result)
         }
@@ -37,11 +37,18 @@ class AppointmentUseCaseImpl(
         flow {
             val startEnd = getStartAndEndDateStrings(date)
             val mockResponseName = formatLocalDateToMonthYear(date)
-            emit(repository.getAvailableTimes(startEnd.first, startEnd.second, mockResponseName).map {
-                convertToLocalDateTime(it)
-            }.filter {
-                it.date == date
-            }.map { it.time }.distinct()
+            emit(
+                appointmentRepository.getAvailableTimes(
+                    startEnd.first,
+                    startEnd.second,
+                    mockResponseName
+                ).map {
+                    convertToLocalDateTime(it)
+                }.filter {
+                    it.date == date
+                }.map {
+                    it.time
+                }.distinct()
             )
         }
 
@@ -93,7 +100,7 @@ class AppointmentUseCaseImpl(
 
     private fun getStartAndEndDateStrings(date: LocalDate): Pair<String, String> {
 
-        val startDateTime = date.toFormattedDateTime(0, 0, 0) // 07:00:00 on the given date
+        val startDateTime = date.toFormattedDateTime(0, 0, 0) // 00:00:00 on the given date
         val endDateTime = date.toFormattedDateTime(23, 59, 59) // 23:59:59 is the valid max time in a day
 
         return Pair(startDateTime, endDateTime)

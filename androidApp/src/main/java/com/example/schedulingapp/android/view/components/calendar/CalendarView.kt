@@ -1,5 +1,6 @@
 // Calendar reference https://medium.com/@meytataliti/android-simple-calendar-with-jetpack-compose-v2-b7311bd6e331
-package com.example.schedulingapp.android.view.components
+// Modified for my case
+package com.example.schedulingapp.android.view.components.calendar
 
 
 import android.annotation.SuppressLint
@@ -41,12 +42,12 @@ import java.time.YearMonth
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarApp(
-    viewModel: CalendarViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    calendarViewModel: CalendarViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     availableDates: List<LocalDate>,
     onDateSelect: (LocalDate?) -> Unit,
     onMonthUpdate: (YearMonth?) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by calendarViewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
         onMonthUpdate(uiState.yearMonth)
@@ -62,11 +63,11 @@ fun CalendarApp(
             yearMonth = uiState.yearMonth,
             dates = uiState.dates,
             onPreviousMonthButtonClicked = { prevMonth ->
-                viewModel.toPreviousMonth(prevMonth)
+                calendarViewModel.toPreviousMonth(prevMonth)
                 onMonthUpdate(prevMonth)
             },
             onNextMonthButtonClicked = { nextMonth ->
-                viewModel.toNextMonth(nextMonth)
+                calendarViewModel.toNextMonth(nextMonth)
                 onMonthUpdate(nextMonth)
             },
             onDateClickListener = {

@@ -3,7 +3,6 @@ package com.example.schedulingapp.repository
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.util.logging.Logger
 
 class AppointmentRepository(
     private val client: HttpClient

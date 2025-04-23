@@ -13,7 +13,7 @@ import kotlinx.datetime.LocalDate
 
 class SelectDateViewModelImpl(
     scope: CoroutineScope,
-    useCase: AppointmentUseCase? = null
+    appointmentUseCase: AppointmentUseCase? = null
 ): SelectDateViewModel {
     override val logo: ImageResource = ImageResource.LOGO
     override val interviewerProfileImage: ImageResource = ImageResource.PROFILE_IMAGE
@@ -49,7 +49,7 @@ class SelectDateViewModelImpl(
     private val _availableDate: StateFlow<List<LocalDate>> =
         combine(startDate, endDate, monthDate) { startDate, endDate, monthDate ->
             if (startDate != null && endDate != null && monthDate != null) {
-                useCase?.getAvailableLocalDates(
+                appointmentUseCase?.getAvailableLocalDates(
                     startDate, endDate, monthDate
                 )?.last() ?: emptyList()
             } else emptyList()

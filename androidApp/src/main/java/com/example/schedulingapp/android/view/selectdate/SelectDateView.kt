@@ -1,5 +1,6 @@
 package com.example.schedulingapp.android.view.selectdate
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +22,6 @@ import com.example.schedulingapp.SelectDateViewModelImpl
 import com.example.schedulingapp.android.getImageAssetName
 import android.content.res.Configuration
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,24 +32,24 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.getValue
-import kotlinx.datetime.TimeZone
 import androidx.compose.runtime.rememberCoroutineScope
-import java.time.YearMonth
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.BackHandler
 import com.example.schedulingapp.SelectHourViewModel
 import com.example.schedulingapp.SelectHourViewModelImpl
 import com.example.schedulingapp.android.MyApplicationTheme
-import com.example.schedulingapp.android.view.components.CalendarApp
+import com.example.schedulingapp.android.view.components.calendar.CalendarApp
 import com.example.schedulingapp.android.view.components.IconTextView
-import java.util.Locale
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.atTime
-import kotlinx.datetime.toInstant
+import com.example.schedulingapp.android.view.components.ListButtonSelectionView
 
 @Composable
-fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewModel, selectHourViewModel : SelectHourViewModel) {
-    val availableDates by viewModel.availableDate.collectAsState()
+fun SelectDateView(
+    navController: NavHostController,
+    selectDateViewModel: SelectDateViewModel,
+    selectHourViewModel : SelectHourViewModel
+) {
+    val availableDates by selectDateViewModel.availableDate.collectAsState()
     MyApplicationTheme {
         Scaffold(
             topBar = {
@@ -61,7 +61,7 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
-                                painter = painterResource(id = getImageAssetName(viewModel.logo)),
+                                painter = painterResource(id = getImageAssetName(selectDateViewModel.logo)),
                                 contentDescription = "App Title",
                                 modifier = Modifier.size(32.dp)
                             )
@@ -85,17 +85,17 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
                     ) {
                         Spacer(modifier = Modifier.height(20.dp))
                         Image(
-                            painter = painterResource(id = getImageAssetName(viewModel.interviewerProfileImage)),
+                            painter = painterResource(id = getImageAssetName(selectDateViewModel.interviewerProfileImage)),
                             contentDescription = "ProfileImage",
                             modifier = Modifier.size(54.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground)
                         )
                         Text(
-                            text = viewModel.interviewerName,
+                            text = selectDateViewModel.interviewerName,
                             style = MaterialTheme.typography.body2
                         )
                         Text(
-                            text = viewModel.interviewerDetail,
+                            text = selectDateViewModel.interviewerDetail,
                             style = MaterialTheme.typography.h1
                         )
                         Column(
@@ -103,8 +103,8 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
                             verticalArrangement = Arrangement.spacedBy(10.dp),
                             modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
                         ) {
-                            IconTextView(viewModel.timeInfo)
-                            IconTextView(viewModel.callInfo)
+                            IconTextView(selectDateViewModel.timeInfo)
+                            IconTextView(selectDateViewModel.callInfo)
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Divider(
@@ -114,11 +114,13 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = viewModel.selectDateTitle,
+                            text = selectDateViewModel.selectDateTitle,
                             style = MaterialTheme.typography.subtitle1
                         )
                         Spacer(modifier = Modifier.height(10.dp))
 
+                        // The calendar I found and edited was supported only for api above O
+                        // use same list as hour if not
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             CalendarApp(availableDates = availableDates,
                                 onDateSelect = { availableDate ->
@@ -129,16 +131,24 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
                                 },
                                 onMonthUpdate = {
                                     it?.let { month ->
-                                        val monthdata = getMonthInfo(month)
-                                        viewModel.setDateAndTime(monthdata.startDateTime, monthdata.endDateTime, monthdata.label)
+                                        val monthData = getMonthInfo(month)
+                                        selectDateViewModel.setDateAndTime(monthData.startDateTime, monthData.endDateTime, monthData.label)
                                     }
 
                                 }
                             )
+                        } else {
+                            ListButtonSelectionView(
+                                padding,
+                                availableDates
+                            ) { availableDate ->
+                                availableDate.let {
+                                    selectHourViewModel.setSelectedDate(availableDate)
+                                }
+                                navController.navigate("second")
+                            }
                         }
-
                     }
-                    // Fixed bottom content
                     Column(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -148,42 +158,21 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
                             .fillMaxWidth()
                     ) {
                         Text(
-                            text = viewModel.timeZoneTitle,
+                            text = selectDateViewModel.timeZoneTitle,
                             style = MaterialTheme.typography.subtitle2
                         )
-                        IconTextView(viewModel.timeZone)
+                        IconTextView(selectDateViewModel.timeZone)
                     }
                 }
             }
         )
     }
-}
+    val context = LocalContext.current
+    val activity = context as? Activity
 
-data class MonthInfo(
-    val startDateTime: String,
-    val endDateTime: String,
-    val label: String
-)
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun getMonthInfo(yearMonth: YearMonth): MonthInfo {
-    val zone = TimeZone.currentSystemDefault()
-
-    val start = LocalDate(yearMonth.year, yearMonth.monthValue, 1)
-        .atTime(LocalTime(hour = 0, minute = 0, second = 0))
-        .toInstant(zone)
-        .toString()
-
-    val yearMonthEnd = yearMonth.atEndOfMonth()
-    val endOfMonth = LocalDate(yearMonthEnd.year, yearMonthEnd.monthValue, yearMonthEnd.dayOfMonth)
-        .atTime(LocalTime(hour = 23, minute = 59, second = 59))
-        .toInstant(zone)
-        .toString()
-
-    val label = YearMonth.of(yearMonth.year, yearMonth.monthValue)
-        .month.getDisplayName(java.time.format.TextStyle.SHORT, Locale.ENGLISH) + "${yearMonth.year}"
-
-    return MonthInfo(start, endOfMonth, label)
+    BackHandler {
+        activity?.finish()
+    }
 }
 
 // Preview for light and dark modes
@@ -192,7 +181,7 @@ fun getMonthInfo(yearMonth: YearMonth): MonthInfo {
 fun LightModePreview() {
     SelectDateView(
         navController = rememberNavController(),
-        viewModel = SelectDateViewModelImpl(rememberCoroutineScope()),
+        selectDateViewModel = SelectDateViewModelImpl(rememberCoroutineScope()),
         selectHourViewModel = SelectHourViewModelImpl(rememberCoroutineScope())
     )
 }
@@ -202,7 +191,7 @@ fun LightModePreview() {
 fun DarkModePreview() {
     SelectDateView(
         navController = rememberNavController(),
-        viewModel = SelectDateViewModelImpl(rememberCoroutineScope()),
+        selectDateViewModel = SelectDateViewModelImpl(rememberCoroutineScope()),
         selectHourViewModel = SelectHourViewModelImpl(rememberCoroutineScope())
     )
 }

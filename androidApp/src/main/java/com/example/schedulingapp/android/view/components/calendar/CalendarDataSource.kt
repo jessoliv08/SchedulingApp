@@ -1,5 +1,5 @@
 // Calendar reference https://medium.com/@meytataliti/android-simple-calendar-with-jetpack-compose-v2-b7311bd6e331
-package com.example.schedulingapp.android.view.components
+package com.example.schedulingapp.android.view.components.calendar
 
 import android.os.Build
 import androidx.annotation.RequiresApi

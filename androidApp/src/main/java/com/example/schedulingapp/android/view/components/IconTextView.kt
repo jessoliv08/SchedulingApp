@@ -17,17 +17,17 @@ import com.example.schedulingapp.IconText
 import com.example.schedulingapp.android.getImageAssetName
 
 @Composable
-fun IconTextView(iconImage: IconText) {
+fun IconTextView(iconTextData: IconText) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Image(
-            painter = painterResource(id = getImageAssetName(iconImage.icon)),
+            painter = painterResource(id = getImageAssetName(iconTextData.icon)),
             contentDescription = "icon",
             modifier = Modifier.size(24.dp),
             colorFilter = ColorFilter.tint(Color.Gray)
         )
-        Text(text = iconImage.text, style = MaterialTheme.typography.body2, color = Color.Gray)
+        Text(text = iconTextData.text, style = MaterialTheme.typography.body2, color = Color.Gray)
     }
 }

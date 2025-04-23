@@ -46,12 +46,12 @@ import kotlinx.datetime.LocalTime
 @Composable
 fun SetupInterviewedView(
     navController: NavHostController,
-    viewModel: SetupInterviewedViewModel
+    setupInterviewedViewModel: SetupInterviewedViewModel
 ) {
-    val dateAndTimeSelectInfo by viewModel.selectDateAndTime.collectAsState()
-    val field1 by viewModel.nameField.collectAsState()
-    val field2 by viewModel.emailField.collectAsState()
-    val button by viewModel.confirmButton.state.collectAsState()
+    val dateAndTimeSelectInfo by setupInterviewedViewModel.selectDateAndTime.collectAsState()
+    val nameField by setupInterviewedViewModel.nameField.collectAsState()
+    val emailField by setupInterviewedViewModel.emailField.collectAsState()
+    val confirmButton by setupInterviewedViewModel.confirmButton.state.collectAsState()
     MyApplicationTheme {
         Scaffold(
             topBar = {
@@ -63,7 +63,7 @@ fun SetupInterviewedView(
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
-                                painter = painterResource(id = getImageAssetName(viewModel.logo)),
+                                painter = painterResource(id = getImageAssetName(setupInterviewedViewModel.logo)),
                                 contentDescription = "App Title",
                                 modifier = Modifier.size(32.dp)
                             )
@@ -72,7 +72,9 @@ fun SetupInterviewedView(
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_baseline_arrow_back_ios_24),
+                                painter = painterResource(
+                                    id = R.drawable.ic_baseline_arrow_back_ios_24
+                                ),
                                 contentDescription = "Back"
                             )
                         }
@@ -88,17 +90,20 @@ fun SetupInterviewedView(
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     Spacer(modifier = Modifier.height(20.dp))
-                    Text(text = viewModel.interviewInfo, style = MaterialTheme.typography.h1)
+                    Text(
+                        text = setupInterviewedViewModel.interviewInfo,
+                        style = MaterialTheme.typography.h1
+                    )
                     Spacer(modifier = Modifier.height(20.dp))
                     Column(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
                     ) {
-                        IconTextView(viewModel.timeInfo)
-                        IconTextView(viewModel.callInfo)
+                        IconTextView(setupInterviewedViewModel.timeInfo)
+                        IconTextView(setupInterviewedViewModel.callInfo)
                         dateAndTimeSelectInfo?.let { IconTextView(it) }
-                        IconTextView(viewModel.timeZone)
+                        IconTextView(setupInterviewedViewModel.timeZone)
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Divider(
@@ -113,29 +118,39 @@ fun SetupInterviewedView(
                         modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
                     ) {
                         Text(
-                            text = viewModel.enterDetails,
+                            text = setupInterviewedViewModel.enterDetails,
                             style = MaterialTheme.typography.subtitle1
                         )
-                        Text(text = viewModel.nameLabel, style = MaterialTheme.typography.body2)
+                        Text(
+                            text = setupInterviewedViewModel.nameLabel, 
+                            style = MaterialTheme.typography.body2
+                        )
                         TextField(
-                            value = field1,
-                            onValueChange = { viewModel.onNameChanged(it) },
-                            label = { Text(viewModel.nameLabel) },
+                            value = nameField,
+                            onValueChange = { setupInterviewedViewModel.onNameChanged(it) },
+                            label = { Text(setupInterviewedViewModel.nameLabel) },
                             modifier = Modifier.fillMaxWidth()
                         )
-                        Text(text = viewModel.emailLabel, style = MaterialTheme.typography.body2)
+                        Text(
+                            text = setupInterviewedViewModel.emailLabel,
+                            style = MaterialTheme.typography.body2
+                        )
                         TextField(
-                            value = field2,
-                            onValueChange = { viewModel.onEmailChanged(it) },
-                            label = { Text(viewModel.emailLabel) },
+                            value = emailField,
+                            onValueChange = { setupInterviewedViewModel.onEmailChanged(it) },
+                            label = { Text(setupInterviewedViewModel.emailLabel) },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text(text = viewModel.descriptionAgree, style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(horizontal = 30.dp), color = Color.Gray)
+                    Text(
+                        text = setupInterviewedViewModel.descriptionAgree,
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(horizontal = 30.dp),
+                        color = Color.Gray
+                    )
                     Button(onClick = {
-                        viewModel.confirmButton.action()
+                        setupInterviewedViewModel.confirmButton.action()
                         navController.navigate("fourth")
                     },
                         shape = RoundedCornerShape(10.dp),
@@ -144,12 +159,11 @@ fun SetupInterviewedView(
                             backgroundColor = MaterialTheme.colors.primary
                         ),
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp),
-                        enabled = button?.enable ?: false
+                        enabled = confirmButton?.enable ?: false
                     ) {
-                        button?.title?.let {
+                        confirmButton?.title?.let {
                             Text(it)
                         }
-
                     }
                 }
             }
@@ -165,7 +179,7 @@ fun SetupInterviewedView(
 fun LightModePreview() {
     SetupInterviewedView(
         navController = rememberNavController(),
-        viewModel = SetupInterviewedViewModelImpl(
+        setupInterviewedViewModel = SetupInterviewedViewModelImpl(
             rememberCoroutineScope()
         ).apply {
             setDateAndTime(LocalDate.parse("2025-04-22"), LocalTime.parse("18:00:00"))
@@ -178,7 +192,7 @@ fun LightModePreview() {
 fun DarkModePreview() {
     SetupInterviewedView(
         navController = rememberNavController(),
-        viewModel = SetupInterviewedViewModelImpl(
+        setupInterviewedViewModel = SetupInterviewedViewModelImpl(
             rememberCoroutineScope()
         ).apply {
             setDateAndTime(LocalDate.parse("2025-04-22"), LocalTime.parse("19:00:00"))

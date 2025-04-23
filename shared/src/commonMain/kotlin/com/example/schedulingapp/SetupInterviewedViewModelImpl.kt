@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.map
 class SetupInterviewedViewModelImpl(
     scope: CoroutineScope,
     private val meetingUseCase: MeetingUseCase? = null,
-    private val useCase: AppointmentUseCase? = null
+    private val appointmentUseCase: AppointmentUseCase? = null
 ): SetupInterviewedViewModel {
     override val logo: ImageResource = ImageResource.LOGO
     override val interviewInfo = "30 Minute Interview"
@@ -57,7 +57,7 @@ class SetupInterviewedViewModelImpl(
         it?.let { localDateAndTime ->
             IconText(
                 icon = ImageResource.CALENDAR_ICON,
-                text = useCase?.formatDateTimeRange(localDateAndTime) ?: ""
+                text = appointmentUseCase?.formatDateTimeRange(localDateAndTime) ?: ""
             )
         }
     }.stateIn(scope, SharingStarted.Lazily, null)
@@ -69,7 +69,7 @@ class SetupInterviewedViewModelImpl(
                 meetingUseCase?.saveMeetingDate(
                     nameField.value,
                     emailField.value,
-                    useCase?.formatDateTimeRange(dateSelected.value!!) ?: ""
+                    appointmentUseCase?.formatDateTimeRange(dateSelected.value!!) ?: ""
                 )
             }
         }
@@ -84,5 +84,5 @@ class SetupInterviewedViewModelImpl(
 
     override val isMeetAvailable = meetingUseCase?.getMeetingDate()?.map {
         it != null
-    }?.stateIn(scope, SharingStarted.Lazily, false) ?: MutableStateFlow(false)
+    }?.stateIn(scope, SharingStarted.Lazily, true) ?: MutableStateFlow(true)
 }
