@@ -2,8 +2,8 @@ package com.example.schedulingapp.android
 
 import com.example.schedulingapp.ImageResource
 
-fun getImageAssetName(profileImage: ImageResource): Int {
-    return when (profileImage) {
+fun getImageAssetName(image: ImageResource): Int {
+    return when (image) {
         ImageResource.PROFILE_IMAGE -> R.drawable.profile
         ImageResource.LOGO -> R.drawable.tree__2_
         ImageResource.CLOCK_ICON -> R.drawable.clock

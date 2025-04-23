@@ -1,7 +1,7 @@
 package com.example.schedulingapp
 
 enum class ImageResource(val imageName: String) {
-    LOGO("logo"),
+    LOGO("tree_logo"),
     PROFILE_IMAGE("profile_image"),
     CLOCK_ICON("clock_icon"),
     CALENDAR_ICON("calendar_icon"),
