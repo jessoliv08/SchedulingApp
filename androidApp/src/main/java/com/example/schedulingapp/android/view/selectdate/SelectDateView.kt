@@ -27,7 +27,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -64,66 +66,99 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
                 )
             },
             content = { padding ->
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(padding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                        .padding(padding)
                 ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Image(
-                        painter = painterResource(id = getImageAssetName(viewModel.interviewerProfileImage)),
-                        contentDescription = "ProfileImage",
-                        modifier = Modifier.size(54.dp),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground)
-                    )
-                    Text(text = viewModel.interviewerName, style = MaterialTheme.typography.body2)
-                    Text(text = viewModel.interviewerDetail, style = MaterialTheme.typography.h1)
                     Column(
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .padding(bottom = 100.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
-                        IconTextView(viewModel.timeInfo)
-                        IconTextView(viewModel.callInfo)
-                    }
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Divider(
-                        color = Color.Gray,
-                        thickness = 1.dp,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = viewModel.selectDateTitle,
-                        style = MaterialTheme.typography.subtitle1
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    for (availableDate in availableDates) {
-                        Button(onClick = {
-                            selectHourViewModel.setSelectedDate(availableDate)
-                            navController.navigate("second")
-                        },
-                            shape = RoundedCornerShape(8.dp),
-                            elevation = null,
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Transparent,
-                                contentColor = MaterialTheme.colors.primary
-                            ),
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp)
-                                .border(1.dp, MaterialTheme.colors.primary.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Image(
+                            painter = painterResource(id = getImageAssetName(viewModel.interviewerProfileImage)),
+                            contentDescription = "ProfileImage",
+                            modifier = Modifier.size(54.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground)
+                        )
+                        Text(
+                            text = viewModel.interviewerName,
+                            style = MaterialTheme.typography.body2
+                        )
+                        Text(
+                            text = viewModel.interviewerDetail,
+                            style = MaterialTheme.typography.h1
+                        )
+                        Column(
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
                         ) {
-                            Text(availableDate.toString())
+                            IconTextView(viewModel.timeInfo)
+                            IconTextView(viewModel.callInfo)
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Divider(
+                            color = Color.Gray,
+                            thickness = 1.dp,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = viewModel.selectDateTitle,
+                            style = MaterialTheme.typography.subtitle1
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(padding)
+                                .verticalScroll(rememberScrollState()),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(5.dp)
+                        ) {
+                            for (availableDate in availableDates) {
+                                Button(
+                                    onClick = {
+                                        selectHourViewModel.setSelectedDate(availableDate)
+                                        navController.navigate("second")
+                                    },
+                                    shape = RoundedCornerShape(8.dp),
+                                    elevation = null,
+                                    colors = ButtonDefaults.buttonColors(
+                                        backgroundColor = Color.Transparent,
+                                        contentColor = MaterialTheme.colors.primary
+                                    ),
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp)
+                                        .border(
+                                            1.dp,
+                                            MaterialTheme.colors.primary.copy(alpha = 0.7f),
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                ) {
+                                    Text(availableDate.toString())
+                                }
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
+                    // Fixed bottom content
                     Column(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(horizontal = 30.dp, vertical = 20.dp)
+                            .fillMaxWidth()
                     ) {
-                        Text(text = viewModel.timeZoneTitle, style = MaterialTheme.typography.subtitle2)
+                        Text(
+                            text = viewModel.timeZoneTitle,
+                            style = MaterialTheme.typography.subtitle2
+                        )
                         IconTextView(viewModel.timeZone)
                     }
                 }
@@ -139,7 +174,7 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
 fun LightModePreview() {
     SelectDateView(
         navController = rememberNavController(),
-        viewModel = SelectDateViewModelImpl(),
+        viewModel = SelectDateViewModelImpl(rememberCoroutineScope()),
         selectHourViewModel = SelectHourViewModelImpl(rememberCoroutineScope())
     )
 }
@@ -149,7 +184,7 @@ fun LightModePreview() {
 fun DarkModePreview() {
     SelectDateView(
         navController = rememberNavController(),
-        viewModel = SelectDateViewModelImpl(),
+        viewModel = SelectDateViewModelImpl(rememberCoroutineScope()),
         selectHourViewModel = SelectHourViewModelImpl(rememberCoroutineScope())
     )
 }

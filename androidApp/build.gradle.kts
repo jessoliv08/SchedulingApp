@@ -58,6 +58,9 @@ dependencies {
     implementation("androidx.compose.animation:animation:1.3.0")
     implementation("androidx.activity:activity-ktx:1.5.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
+    implementation("io.ktor:ktor-client-okhttp:2.3.5")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
 }
 
 

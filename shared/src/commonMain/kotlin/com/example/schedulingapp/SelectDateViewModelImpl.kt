@@ -1,15 +1,17 @@
 package com.example.schedulingapp
 
+import com.example.schedulingapp.usecase.AppointmentUseCase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.datetime.Instant
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
-
-class SelectDateViewModelImpl: SelectDateViewModel {
+class SelectDateViewModelImpl(
+    scope: CoroutineScope,
+    useCase: AppointmentUseCase? = null
+): SelectDateViewModel {
     override val logo: ImageResource = ImageResource.LOGO
     override val interviewerProfileImage: ImageResource = ImageResource.PROFILE_IMAGE
     override val interviewerName = "Jessica Oliveira"
@@ -28,20 +30,8 @@ class SelectDateViewModelImpl: SelectDateViewModel {
         text = "Eastern Time - US & Canada"
     )
     override val selectDateTitle = "Select a Day"
-    private val _availableDate = MutableStateFlow(
-        listOf(
-            "2025-04-23T14:00:00Z",
-            "2025-04-23T15:00:00Z",
-            "2025-04-22T16:00:00Z",
-            "2025-04-21T17:00:00Z",
-            "2025-04-22T18:00:00Z"
-        ).map { convertToLocalDate(it) }.distinct()
-    )
-    override val availableDate: StateFlow<List<LocalDate>> = _availableDate.asStateFlow()
-
-
-    private fun convertToLocalDate(isoString: String): LocalDate {
-        val instant = Instant.parse(isoString)
-        return instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
-    }
+    private val _availableDate = useCase?.getAvailableLocalDates(
+        "2025-04-01T07:00:00", "2025-04-30T06:59:59", "Apr2025"
+    )?.stateIn(scope, SharingStarted.Lazily, emptyList()) ?: MutableStateFlow(emptyList())
+    override val availableDate: StateFlow<List<LocalDate>> = _availableDate
 }

@@ -36,18 +36,20 @@ kotlin {
                 implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
                 implementation("com.russhwolf:multiplatform-settings-coroutines:1.1.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-            }
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
+                implementation("io.ktor:ktor-client-core:2.3.5")
+                implementation("io.ktor:ktor-client-content-negotiation:2.3.5")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.5")
             }
         }
 
         val iosMain by creating {
             dependsOn(commonMain)
         }
-
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
         val iosX64Main by getting {
             dependsOn(iosMain)
         }

@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -97,26 +99,40 @@ fun SelectHourView(
                         text = viewModel.selectHourDescription,
                         style = MaterialTheme.typography.body2
                     )
-                    for (availableDate in availableTimes) {
-                        Button(onClick = {
-                            selectedDate?.let {
-                                setupInterviewedViewModel.setDateAndTime(
-                                    it,
-                                    availableDate
-                                )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding)
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        for (availableDate in availableTimes) {
+                            Button(
+                                onClick = {
+                                    selectedDate?.let {
+                                        setupInterviewedViewModel.setDateAndTime(
+                                            it,
+                                            availableDate
+                                        )
+                                    }
+                                    navController.navigate("third")
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                elevation = null,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color.Transparent,
+                                    contentColor = MaterialTheme.colors.primary
+                                ),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp)
+                                    .border(
+                                        1.dp,
+                                        MaterialTheme.colors.primary.copy(alpha = 0.7f),
+                                        RoundedCornerShape(8.dp)
+                                    )
+                            ) {
+                                Text(availableDate.toString())
                             }
-                            navController.navigate("third")
-                        },
-                            shape = RoundedCornerShape(8.dp),
-                            elevation = null,
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Transparent,
-                                contentColor = MaterialTheme.colors.primary
-                            ),
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp)
-                                .border(1.dp, MaterialTheme.colors.primary.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
-                        ) {
-                            Text(availableDate.toString())
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package com.example.schedulingapp
 
+import com.example.schedulingapp.usecase.AppointmentUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -8,21 +9,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
 import com.example.schedulingapp.usecase.MeetingUseCase
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
 
 class SetupInterviewedViewModelImpl(
     scope: CoroutineScope,
-    private val meetingUseCase: MeetingUseCase? = null
+    private val meetingUseCase: MeetingUseCase? = null,
+    private val useCase: AppointmentUseCase? = null
 ): SetupInterviewedViewModel {
     override val logo: ImageResource = ImageResource.LOGO
     override val interviewInfo = "30 Minute Interview"
@@ -61,7 +57,7 @@ class SetupInterviewedViewModelImpl(
         it?.let { localDateAndTime ->
             IconText(
                 icon = ImageResource.CALENDAR_ICON,
-                text = formatDateTimeRange(localDateAndTime)
+                text = useCase?.formatDateTimeRange(localDateAndTime) ?: ""
             )
         }
     }.stateIn(scope, SharingStarted.Lazily, null)
@@ -73,7 +69,7 @@ class SetupInterviewedViewModelImpl(
                 meetingUseCase?.saveMeetingDate(
                     nameField.value,
                     emailField.value,
-                    formatDateTimeRange(dateSelected.value!!)
+                    useCase?.formatDateTimeRange(dateSelected.value!!) ?: ""
                 )
             }
         }
@@ -89,32 +85,4 @@ class SetupInterviewedViewModelImpl(
     override val isMeetAvailable = meetingUseCase?.getMeetingDate()?.map {
         it != null
     }?.stateIn(scope, SharingStarted.Lazily, false) ?: MutableStateFlow(false)
-
-    private fun formatDateTimeRange(startDateTime: LocalDateTime): String {
-        val endDateTime = startDateTime
-            .toInstant(TimeZone.currentSystemDefault())
-            .plus(30, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-
-        val startHour = formatTime(startDateTime)
-        val endHour = formatTime(endDateTime)
-
-        val dayOfWeek = startDateTime.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }
-        val month = startDateTime.month.name.lowercase().replaceFirstChar { it.uppercase() }
-        val day = startDateTime.dayOfMonth
-        val year = startDateTime.year
-
-        return "$startHour - $endHour, $dayOfWeek, $month $day, $year"
-    }
-
-    private fun formatTime(dateTime: LocalDateTime): String {
-        val hour = dateTime.hour
-        val minute = dateTime.minute
-        val isAm = hour < 12
-        val hour12 = if (hour % 12 == 0) 12 else hour % 12
-        val minutePadded = minute.toString().padStart(2, '0')
-        val suffix = if (isAm) "am" else "pm"
-        return "$hour12:$minutePadded$suffix"
-    }
-
 }
