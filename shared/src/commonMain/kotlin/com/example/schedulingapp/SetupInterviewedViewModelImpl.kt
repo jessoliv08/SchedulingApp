@@ -16,8 +16,14 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import com.example.schedulingapp.usecase.MeetingUseCase
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.map
 
-class SetupInterviewedViewModelImpl(scope: CoroutineScope): SetupInterviewedViewModel {
+class SetupInterviewedViewModelImpl(
+    scope: CoroutineScope,
+    private val meetingUseCase: MeetingUseCase? = null
+): SetupInterviewedViewModel {
     override val logo: ImageResource = ImageResource.LOGO
     override val interviewInfo = "30 Minute Interview"
     override val timeInfo = IconText(
@@ -63,6 +69,13 @@ class SetupInterviewedViewModelImpl(scope: CoroutineScope): SetupInterviewedView
     override val confirmButton = object : ButtonViewModel {
         override fun action() {
             // save date, hour, name and email
+            if (nameField.value.isNotBlank() && emailField.value.isNotBlank() && dateSelected.value != null) {
+                meetingUseCase?.saveMeetingDate(
+                    nameField.value,
+                    emailField.value,
+                    formatDateTimeRange(dateSelected.value!!)
+                )
+            }
         }
 
         override val state = nameField.combine(emailField) { name, email ->
@@ -72,6 +85,10 @@ class SetupInterviewedViewModelImpl(scope: CoroutineScope): SetupInterviewedView
             )
         }.stateIn(scope, SharingStarted.Lazily, null)
     }
+
+    override val isMeetAvailable = meetingUseCase?.getMeetingDate()?.map {
+        it != null
+    }?.stateIn(scope, SharingStarted.Lazily, false) ?: MutableStateFlow(false)
 
     private fun formatDateTimeRange(startDateTime: LocalDateTime): String {
         val endDateTime = startDateTime

@@ -21,4 +21,5 @@ interface SetupInterviewedViewModel {
     fun onEmailChanged(newValue: String)
     val descriptionAgree: String
     val confirmButton: ButtonViewModel
+    val isMeetAvailable: StateFlow<Boolean>
 }

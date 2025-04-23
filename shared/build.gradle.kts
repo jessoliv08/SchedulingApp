@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("com.android.library")
+    kotlin("plugin.serialization")
 }
 group = "com.example.schedulingapp"
 
@@ -31,7 +32,10 @@ kotlin {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0") // Or latest version
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+                implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
+                implementation("com.russhwolf:multiplatform-settings-coroutines:1.1.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
             }
         }
         val commonTest by getting {

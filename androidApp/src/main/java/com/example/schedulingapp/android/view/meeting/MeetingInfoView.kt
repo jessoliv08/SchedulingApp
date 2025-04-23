@@ -22,6 +22,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +36,10 @@ import com.example.schedulingapp.MeetingInfoViewModelImpl
 import com.example.schedulingapp.android.MyApplicationTheme
 import com.example.schedulingapp.android.getImageAssetName
 import com.example.schedulingapp.android.view.components.IconTextView
+import com.example.schedulingapp.repository.MeetingInfo
+import com.example.schedulingapp.usecase.MeetingUseCase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun MeetingInfoView(
@@ -42,6 +47,9 @@ fun MeetingInfoView(
     viewModel: MeetingInfoViewModel
 ) {
     val button by viewModel.cancelButton.state.collectAsState()
+    val name by viewModel.name.collectAsState()
+    val email by viewModel.email.collectAsState()
+    val calendarInfo by viewModel.calendarInfo.collectAsState()
 
     MyApplicationTheme {
         Scaffold(
@@ -79,7 +87,10 @@ fun MeetingInfoView(
                     ) {
                         IconTextView(viewModel.timeInfo)
                         IconTextView(viewModel.callInfo)
+                        calendarInfo?.let { IconTextView(it) }
                         IconTextView(viewModel.timeZone)
+                        name?.let { IconTextView(it) }
+                        email?.let { IconTextView(it) }
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(onClick = {
@@ -112,7 +123,26 @@ fun MeetingInfoView(
 fun LightModePreview() {
     MeetingInfoView(
         navController = rememberNavController(),
-        viewModel = MeetingInfoViewModelImpl(),
+        viewModel = MeetingInfoViewModelImpl(
+            rememberCoroutineScope(),
+            object : MeetingUseCase {
+                override fun saveMeetingDate(name: String, email: String, dateAndTime: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMeetingDate(): Flow<MeetingInfo?> {
+                    return flowOf(MeetingInfo(
+                        name = "Jessica Oliveira",
+                        email = "someEmail@gmail.com",
+                        dateTime = "8:30am - 9:30am, Friday, April 17, 2025"
+                    ))
+                }
+
+                override fun clearMeetingDate() {
+                    TODO("Not yet implemented")
+                }
+
+            }),
     )
 }
 
@@ -121,6 +151,24 @@ fun LightModePreview() {
 fun DarkModePreview() {
     MeetingInfoView(
         navController = rememberNavController(),
-        viewModel = MeetingInfoViewModelImpl(),
+        viewModel = MeetingInfoViewModelImpl(rememberCoroutineScope(),
+            object : MeetingUseCase {
+                override fun saveMeetingDate(name: String, email: String, dateAndTime: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMeetingDate(): Flow<MeetingInfo?> {
+                    return flowOf(MeetingInfo(
+                        name = "Jessica Oliveira",
+                        email = "someEmail@gmail.com",
+                        dateTime = "8:30am - 9:30am, Friday, April 17, 2025"
+                    ))
+                }
+
+                override fun clearMeetingDate() {
+                    TODO("Not yet implemented")
+                }
+
+            }),
     )
 }

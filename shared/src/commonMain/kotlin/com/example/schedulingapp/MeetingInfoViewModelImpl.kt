@@ -1,8 +1,16 @@
 package com.example.schedulingapp
 
+import com.example.schedulingapp.usecase.MeetingUseCase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.stateIn
 
-class MeetingInfoViewModelImpl: MeetingInfoViewModel {
+class MeetingInfoViewModelImpl(
+    scope: CoroutineScope,
+    private val meetingUseCase: MeetingUseCase
+): MeetingInfoViewModel {
     override val logo: ImageResource = ImageResource.LOGO
     override val interviewInfo = "Meeting with Jessica Oliveira"
     override val timeInfo = IconText(
@@ -20,7 +28,7 @@ class MeetingInfoViewModelImpl: MeetingInfoViewModel {
 
     override val cancelButton = object : ButtonViewModel {
         override fun action() {
-            // clear all info
+            meetingUseCase.clearMeetingDate()
         }
 
         override val state = MutableStateFlow( ButtonViewModel.State(
@@ -28,4 +36,27 @@ class MeetingInfoViewModelImpl: MeetingInfoViewModel {
             enable = true
         ))
     }
+
+    private val meetingInfo = meetingUseCase.getMeetingDate()
+
+    override val calendarInfo = meetingInfo.mapNotNull {
+        IconText(
+            ImageResource.CALENDAR_ICON,
+            it?.dateTime ?: ""
+        )
+    }.stateIn(scope, SharingStarted.Lazily, null)
+
+    override val name = meetingInfo.mapNotNull {
+        IconText(
+            ImageResource.PROFILE_IMAGE,
+            it?.name ?: ""
+        )
+    }.stateIn(scope, SharingStarted.Lazily, null)
+
+    override val email = meetingInfo.mapNotNull {
+        IconText(
+            ImageResource.EMAIL_ICON,
+            it?.email ?: ""
+        )
+    }.stateIn(scope, SharingStarted.Lazily, null)
 }
