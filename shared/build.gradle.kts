@@ -44,6 +44,9 @@ kotlin {
 
         val iosMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                implementation("io.ktor:ktor-client-darwin:2.0.0") // 👈 required
+            }
         }
         val commonTest by getting {
             dependencies {
