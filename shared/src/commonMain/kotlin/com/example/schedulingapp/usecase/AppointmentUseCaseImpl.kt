@@ -3,6 +3,7 @@ package com.example.schedulingapp.usecase
 import com.example.schedulingapp.repository.AppointmentRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -13,7 +14,6 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
-
 class AppointmentUseCaseImpl(
     private val repository: AppointmentRepository
 ): AppointmentUseCase {
@@ -23,16 +23,20 @@ class AppointmentUseCaseImpl(
         mockResponseName: String
     ): Flow<List<LocalDate>> =
         flow {
-            emit(repository.getAvailableTimes(startDateTime, endDateTime, mockResponseName)
-                .map { convertToLocalDate(it) }.distinct())
+            val today = Clock.System.now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date
+            val result = repository.getAvailableTimes(startDateTime, endDateTime, mockResponseName)
+                .map { convertToLocalDate(it) }.filter { it >= today }.distinct()
+            emit(result)
         }
 
     override fun getAvailableLocalTimes(
-        date: LocalDate,
-        mockResponseName: String
+        date: LocalDate
     ): Flow<List<LocalTime>> =
         flow {
             val startEnd = getStartAndEndDateStrings(date)
+            val mockResponseName = formatLocalDateToMonthYear(date)
             emit(repository.getAvailableTimes(startEnd.first, startEnd.second, mockResponseName).map {
                 convertToLocalDateTime(it)
             }.filter {
@@ -40,6 +44,25 @@ class AppointmentUseCaseImpl(
             }.map { it.time }.distinct()
             )
         }
+
+    private fun formatLocalDateToMonthYear(localDate: LocalDate): String {
+        val monthName = when (localDate.monthNumber) {
+            1 -> "Jan"
+            2 -> "Feb"
+            3 -> "Mar"
+            4 -> "Apr"
+            5 -> "May"
+            6 -> "Jun"
+            7 -> "Jul"
+            8 -> "Aug"
+            9 -> "Sep"
+            10 -> "Oct"
+            11 -> "Nov"
+            12 -> "Dec"
+            else -> "Default"
+        }
+        return "$monthName${localDate.year}"
+    }
 
     override fun formatDateTimeRange(startDateTime: LocalDateTime): String {
         val endDateTime = startDateTime

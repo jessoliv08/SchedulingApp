@@ -29,7 +29,7 @@ class SelectHourViewModelImpl(scope: CoroutineScope, useCase: AppointmentUseCase
     override val selectHourDescription = "Duration: 30 min"
     private val _availableDate = dateSelected.flatMapLatest { date ->
         date?.let {
-            useCase?.getAvailableLocalTimes(it, "Apr2025")
+            useCase?.getAvailableLocalTimes(it)
         } ?: flowOf(emptyList())
     }.stateIn(scope, SharingStarted.Lazily, emptyList())
     override val availableTime: StateFlow<List<LocalTime>> = _availableDate

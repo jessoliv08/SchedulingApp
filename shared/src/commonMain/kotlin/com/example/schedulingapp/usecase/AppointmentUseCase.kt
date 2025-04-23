@@ -13,8 +13,7 @@ interface AppointmentUseCase {
     ): Flow<List<LocalDate>>
 
     fun getAvailableLocalTimes(
-        date: LocalDate,
-        mockResponseName: String
+        date: LocalDate
     ): Flow<List<LocalTime>>
 
     fun formatDateTimeRange(startDateTime: LocalDateTime): String

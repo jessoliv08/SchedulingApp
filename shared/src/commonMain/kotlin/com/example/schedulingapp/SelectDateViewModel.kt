@@ -14,4 +14,5 @@ interface SelectDateViewModel {
     val timeZone: IconText
     val selectDateTitle: String
     val availableDate: StateFlow<List<LocalDate>>
+    fun setDateAndTime(date: String, endDate: String, month: String)
 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -21,27 +20,32 @@ import com.example.schedulingapp.SelectDateViewModel
 import com.example.schedulingapp.SelectDateViewModelImpl
 import com.example.schedulingapp.android.getImageAssetName
 import android.content.res.Configuration
-import androidx.compose.foundation.border
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.getValue
+import kotlinx.datetime.TimeZone
 import androidx.compose.runtime.rememberCoroutineScope
+import java.time.YearMonth
 import androidx.compose.ui.graphics.ColorFilter
 import com.example.schedulingapp.SelectHourViewModel
 import com.example.schedulingapp.SelectHourViewModelImpl
 import com.example.schedulingapp.android.MyApplicationTheme
+import com.example.schedulingapp.android.view.components.CalendarApp
 import com.example.schedulingapp.android.view.components.IconTextView
+import java.util.Locale
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.atTime
+import kotlinx.datetime.toInstant
 
 @Composable
 fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewModel, selectHourViewModel : SelectHourViewModel) {
@@ -114,37 +118,25 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
                             style = MaterialTheme.typography.subtitle1
                         )
                         Spacer(modifier = Modifier.height(10.dp))
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(padding)
-                                .verticalScroll(rememberScrollState()),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(5.dp)
-                        ) {
-                            for (availableDate in availableDates) {
-                                Button(
-                                    onClick = {
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            CalendarApp(availableDates = availableDates,
+                                onDateSelect = { availableDate ->
+                                    availableDate?.let {
                                         selectHourViewModel.setSelectedDate(availableDate)
-                                        navController.navigate("second")
-                                    },
-                                    shape = RoundedCornerShape(8.dp),
-                                    elevation = null,
-                                    colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = Color.Transparent,
-                                        contentColor = MaterialTheme.colors.primary
-                                    ),
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp)
-                                        .border(
-                                            1.dp,
-                                            MaterialTheme.colors.primary.copy(alpha = 0.7f),
-                                            RoundedCornerShape(8.dp)
-                                        )
-                                ) {
-                                    Text(availableDate.toString())
+                                    }
+                                    navController.navigate("second")
+                                },
+                                onMonthUpdate = {
+                                    it?.let { month ->
+                                        val monthdata = getMonthInfo(month)
+                                        viewModel.setDateAndTime(monthdata.startDateTime, monthdata.endDateTime, monthdata.label)
+                                    }
+
                                 }
-                            }
+                            )
                         }
+
                     }
                     // Fixed bottom content
                     Column(
@@ -167,6 +159,32 @@ fun SelectDateView(navController: NavHostController, viewModel: SelectDateViewMo
     }
 }
 
+data class MonthInfo(
+    val startDateTime: String,
+    val endDateTime: String,
+    val label: String
+)
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun getMonthInfo(yearMonth: YearMonth): MonthInfo {
+    val zone = TimeZone.currentSystemDefault()
+
+    val start = LocalDate(yearMonth.year, yearMonth.monthValue, 1)
+        .atTime(LocalTime(hour = 0, minute = 0, second = 0))
+        .toInstant(zone)
+        .toString()
+
+    val yearMonthEnd = yearMonth.atEndOfMonth()
+    val endOfMonth = LocalDate(yearMonthEnd.year, yearMonthEnd.monthValue, yearMonthEnd.dayOfMonth)
+        .atTime(LocalTime(hour = 23, minute = 59, second = 59))
+        .toInstant(zone)
+        .toString()
+
+    val label = YearMonth.of(yearMonth.year, yearMonth.monthValue)
+        .month.getDisplayName(java.time.format.TextStyle.SHORT, Locale.ENGLISH) + "${yearMonth.year}"
+
+    return MonthInfo(start, endOfMonth, label)
+}
 
 // Preview for light and dark modes
 @Preview(name = "Light Mode", uiMode = Configuration.UI_MODE_NIGHT_NO)
