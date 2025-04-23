@@ -8,14 +8,24 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.schedulingapp.ScheduleMeetingViewModel
+import com.example.schedulingapp.MeetingInfoViewModel
+import com.example.schedulingapp.SelectDateViewModel
+import com.example.schedulingapp.SelectHourViewModel
+import com.example.schedulingapp.SetupInterviewedViewModel
 import com.example.schedulingapp.android.MyApplicationTheme
+import com.example.schedulingapp.android.view.interviewed.SetupInterviewedView
+import com.example.schedulingapp.android.view.meeting.MeetingInfoView
 import com.example.schedulingapp.android.view.selectdate.SelectDateView
 import com.example.schedulingapp.android.view.selecthour.SelectHourView
 
 
 @Composable
-fun SchedulingMainView(viewModel : ScheduleMeetingViewModel) {
+fun SchedulingMainView(
+    viewModel : SelectDateViewModel,
+    selectHourViewModel : SelectHourViewModel,
+    setupInterviewedViewModel: SetupInterviewedViewModel,
+    meetingInfoViewModel: MeetingInfoViewModel
+) {
     MyApplicationTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -24,8 +34,10 @@ fun SchedulingMainView(viewModel : ScheduleMeetingViewModel) {
             val navController = rememberNavController()
 
             NavHost(navController = navController, startDestination = "first") {
-                composable("first") { SelectDateView(navController, viewModel) }
-                composable("second") { SelectHourView(navController, viewModel) }
+                composable("first") { SelectDateView(navController, viewModel, selectHourViewModel) }
+                composable("second") { SelectHourView(navController, selectHourViewModel, setupInterviewedViewModel) }
+                composable("third") { SetupInterviewedView(navController, setupInterviewedViewModel) }
+                composable("fourth") { MeetingInfoView(navController, meetingInfoViewModel) }
             }
         }
     }
